@@ -2,14 +2,15 @@
 
 ### Resources: 
 # Servo control article: https://www.learnrobotics.org/blog/raspberry-pi-servo-motor/
+# YouTube Livestream article: https://www.makeuseof.com/tag/live-stream-youtube-raspberry-pi/
 
 import pygame
 import RPi.GPIO as GPIO
 from time import sleep
 
 def servoSetAngle(servo, angle):
-    round(angle)
-    duty = angle/18 + 2    
+    #round(angle)
+    duty = angle/18 + 2
     servo.ChangeDutyCycle(duty)
 
 
@@ -52,9 +53,9 @@ class TextPrint(object):
 pygame.init()
 
 # Set the width and height of the screen (width, height).
-screen = pygame.display.set_mode((500, 700))
+#screen = pygame.display.set_mode((500, 700))
 
-pygame.display.set_caption("My Game")
+#pygame.display.set_caption("My Game")
 
 # Loop until the user clicks the close button.
 done = False
@@ -75,20 +76,20 @@ while not done:
     #
     # Possible joystick actions: JOYAXISMOTION, JOYBALLMOTION, JOYBUTTONDOWN,
     # JOYBUTTONUP, JOYHATMOTION
-    for event in pygame.event.get(): # User did something.
-        if event.type == pygame.QUIT: # If user clicked close.
-            done = True # Flag that we are done so we exit this loop.
-        elif event.type == pygame.JOYBUTTONDOWN:
-            print("Joystick button pressed.")
-        elif event.type == pygame.JOYBUTTONUP:
-            print("Joystick button released.")
+    #for event in pygame.event.get(): # User did something.
+    #    if event.type == pygame.QUIT: # If user clicked close.
+    #        done = True # Flag that we are done so we exit this loop.
+    #    elif event.type == pygame.JOYBUTTONDOWN:
+    #        print("Joystick button pressed.")
+    #    elif event.type == pygame.JOYBUTTONUP:
+    #        print("Joystick button released.")
 
     #
     # DRAWING STEP
     #
     # First, clear the screen to white. Don't put other drawing commands
     # above this, or they will be erased with this command.
-    screen.fill(WHITE)
+    #screen.fill(WHITE)
     textPrint.reset()
 
     # Get count of joysticks.
@@ -102,51 +103,51 @@ while not done:
         # Usually axis run in pairs, up/down for one, and left/right for
         # the other.
         axes = joystick.get_numaxes()
-        textPrint.tprint(screen, "Number of axes: {}".format(axes))
-        textPrint.indent()
+        #textPrint.tprint(screen, "Number of axes: {}".format(axes))
+        #textPrint.indent()
 
         for i in range(axes):
             axis = joystick.get_axis(i)
             if (i == 0):
                 servoSetAngle(servo, (axis+1)*90)
             textPrint.tprint(screen, "Axis {} value: {:>6.3f}".format(i, axis))
-        textPrint.unindent()
+        #textPrint.unindent()
 
         buttons = joystick.get_numbuttons()
-        textPrint.tprint(screen, "Number of buttons: {}".format(buttons))
-        textPrint.indent()
+        #textPrint.tprint(screen, "Number of buttons: {}".format(buttons))
+        #textPrint.indent()
 
         for i in range(buttons):
             button = joystick.get_button(i)
             if (i == 1):
                 if (button):
                     done = True
-            textPrint.tprint(screen,
-                             "Button {:>2} value: {}".format(i, button))
-        textPrint.unindent()
+            #textPrint.tprint(screen,
+            #                 "Button {:>2} value: {}".format(i, button))
+        #textPrint.unindent()
 
         hats = joystick.get_numhats()
-        textPrint.tprint(screen, "Number of hats: {}".format(hats))
-        textPrint.indent()
+        #textPrint.tprint(screen, "Number of hats: {}".format(hats))
+        #textPrint.indent()
 
         # Hat position. All or nothing for direction, not a float like
         # get_axis(). Position is a tuple of int values (x, y).
         for i in range(hats):
             hat = joystick.get_hat(i)
-            textPrint.tprint(screen, "Hat {} value: {}".format(i, str(hat)))
-        textPrint.unindent()
+            #textPrint.tprint(screen, "Hat {} value: {}".format(i, str(hat)))
+        #textPrint.unindent()
 
-        textPrint.unindent()
+        #textPrint.unindent()
 
     #
     # ALL CODE TO DRAW SHOULD GO ABOVE THIS COMMENT
     #
 
     # Go ahead and update the screen with what we've drawn.
-    pygame.display.flip()
+    #pygame.display.flip()
 
     # Limit to 20 frames per second.
-    clock.tick(20)
+    #clock.tick(20)
 
 # Close the window and quit.
 # If you forget this line, the program will 'hang'
