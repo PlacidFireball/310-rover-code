@@ -1,27 +1,27 @@
-### EGEN 310R Runner Script
-### Written by Jared Weiss at Montana State University
-### Resources:
+# EGEN 310R Runner Script
+# Written by Jared Weiss at Montana State University
+# Resources:
 # Servo control article: https://www.learnrobotics.org/blog/raspberry-pi-servo-motor/
 # YouTube Livestream article: https://www.makeuseof.com/tag/live-stream-youtube-raspberry-pi/
 # pigpio docs: https://docs.juliahub.com/PiGPIO/8aGxa/0.2.0/api/
 # minimize servo jitter: https://ben.akrin.com/raspberry-pi-servo-jitter/
 
-###JOYSTICK CONTROL INFO:
-###Left Joystick: Axis 0, 1
-###    - 1 Up (-1) down (1)
-###    - 0 Left (-1) right (1)
-###Right Joystick: Axis 2, 3
-###    - 3 Up (-1) down (1)
-###    - 2 Left (-1) right (1)
-###Left Trigger: Axis 5
-###    - (-1 no press) (1 full press)
-###Right Trigger: Axis 4
-###A button -> button 0
-###B button -> button 1
-###X -> 3
-###Y -> 4
-###D-Pad:(Hat)Up Down Left Right
-###      (0, 1) (0, -1) (-1, 0) (1, 0)
+# JOYSTICK CONTROL INFO:
+# Left Joystick: Axis 0, 1
+#     - 1 Up (-1) down (1)
+#     - 0 Left (-1) right (1)
+# Right Joystick: Axis 2, 3
+#     - 3 Up (-1) down (1)
+#     - 2 Left (-1) right (1)
+# Left Trigger: Axis 5
+#     - (-1 no press) (1 full press)
+# Right Trigger: Axis 4
+# A button -> button 0
+# B button -> button 1
+# X -> 3
+# Y -> 4
+# D-Pad:(Hat)Up Down Left Right
+#       (0, 1) (0, -1) (-1, 0) (1, 0)
 
 import pygame
 import RPi.GPIO as GPIO
@@ -90,15 +90,12 @@ while not done:
             print("Axis {} value: {:>6.3f}".format(i, axis))
 
         buttons = joystick.get_numbuttons()
-        print("Number of buttons: {}".format(buttons))
-
         # Exit on the B button
         for i in range(buttons):
             button = joystick.get_button(i)
             if (i == 1):
                 if (button):
                     done = True
-            print("Button {:>2} value: {}".format(i, button))
     
     clock.tick(20)
 
@@ -106,6 +103,6 @@ pygame.quit()
 for name, pin in servos.items():
     print(f"Cleaning up {name} on pin {pin}")
     pwm.set_PWM_dutycycle(pin, 0)
-    pwm.set_PWM_frequency(servo, 0)
+    pwm.set_PWM_frequency(pin, 0)
     
 # End egen310.py
