@@ -74,12 +74,15 @@ pygame.init()         			# initialize the pygame module for controller input
 clock = pygame.time.Clock() 		# make a clock so we can get accurate timing should we need it
 
 done = False
+debug_joystick = True
 # Initialize the joysticks.
 pygame.joystick.init()
 
-
+steering_angle = 90
 arm_angle = 125
 arm_elevation_angle = 90
+
+DEADZONE = 0.4
 
 ### -------------------------------- MAIN PROGRAM LOOP ----------------------------------
 while not done:
@@ -89,6 +92,12 @@ while not done:
     # Get count of joysticks and stick all the joystick objects
     # into a cute little list
     joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+    if debug_joystick and joysticks:
+        print(f"{basename}: Controller initialized. Running...")
+        debug_joystick = False
+    elif not joysticks:
+        print(f"{basename}: No controller detected. Waiting...")
+        time.sleep(5)
     # For each joystick:
     for joystick in joysticks:
         #print(joystick.get_name()) # log debug info to the console
@@ -96,16 +105,25 @@ while not done:
         for i in range(axes): # do different stuff with each one
             axis = joystick.get_axis(i)
             if (i == 0):
-                servoSetAngle(servos["steering"]    , 90 + (axis)*45) # servo gos through full range of motion
+                if (axis < -1*DEADZONE):
+                    steering_angle -= 2
+                elif (axis > DEADZONE):
+                    steering_angle += 2
+                if (steering_angle > 135):
+                    steering_angle = 135
+                elif (steering_angle < 45):
+                    steering_angle = 45
+                servoSetAngle(servos["steering"]    , steering_angle)   # steering servo can go +/- 45 degrees from center
             if (i == 1):
-                servoSetAngle(servos["drivetrain"]  , 90 + (axis)*10) 	# we write a small range so that we have more control over speed
-									# any higher than this and we can't control it very well
+                if (axis > 0.2 or axis < -0.2):
+                    servoSetAngle(servos["drivetrain"]  , 90 + (axis)*10) 	# we write a small range so that we have more control over speed
+									        # any higher than this and we can't control it very well
             if (i == 2):
 		# these if statements are so that we can let go of the joystick and the arm will stay in place
                 # we 0.4 is just so we have a little deadspot, makes it easier to control
-                if (axis < -0.4):
+                if (axis < -1*DEADZONE):
                     arm_angle -= 2
-                if (axis > 0.4):
+                if (axis > DEADZONE):
                     arm_angle += 2
                 if arm_angle < 0:
                     arm_angle = 0
@@ -114,9 +132,9 @@ while not done:
                 #print("Arm rotation: "+str(arm_angle))
                 servoSetAngle(servos["arm_rotate"]  , arm_angle) # arm rotation may need to be toned up as we stabilize it
             if (i == 3):
-                if (axis > 0.4):
+                if (axis > DEADZONE):
                     arm_elevation_angle -= 2
-                if (axis < -0.4):
+                if (axis < -1*DEADZONE):
                     arm_elevation_angle += 2
                 if arm_elevation_angle < 42: 		# minimum angle we can write to the arm elevation servo
                     arm_elevation_angle = 42

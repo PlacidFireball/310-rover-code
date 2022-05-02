@@ -21,12 +21,16 @@ function ctrl_c() {
 	echo $0": Caught Ctrl+C..".
 	echo $0": Cleaning up modules..."
 	sudo rmmod $module && echo Removed $module
+        echo $0": Killing python script..."
+        pid=$(pgrep -u pi python3)
+	echo $0: script pid: $pid, killing...
+        sudo kill -9 $pid
 	echo $0": Exiting..."
 }
 trap ctrl_c SIGINT
 
 function run_py_script() {
-	python3 egen310.py
+	python3 egen310.py&
 }
 
 ### cvlc
@@ -37,6 +41,6 @@ function run_py_script() {
 #raspivid -t 0 -w $width -h $height -fps $fps -l -o tcp://0.0.0.0:5000
 ### HTTP
 echo "Using HTTP"
-run_py_script&
+run_py_script
 sudo modprobe $module
 cvlc v4l2:///dev/video0 --v4l2-width $width --v4l2-height $height --v4l2-chroma h264 --sout '#standard{access=http,mux=ts,dst=0.0.0.0:12345}'
