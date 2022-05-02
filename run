@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# Written by Jared Weiss to attempt to get a local network stream working.
+# Currently suffers from terrible jitter and dropped frames. Think it may just
+# be my terrible internet connection.
+
+
+
+fps=12
+echo $0: fps: $fps
+height=1080
+echo $0: height: $height
+width=1920
+echo $0: width: $width
+
+module=bcm2835-v4l2
+
+
+stty -echoctl # hides ^C
+function ctrl_c() {
+	echo $0": Caught Ctrl+C..".
+	echo $0": Cleaning up modules..."
+	sudo rmmod $module && echo Removed $module
+	echo $0": Exiting..."
+}
+trap ctrl_c SIGINT
+
+function run_py_script() {
+	python3 egen310.py
+}
+
+### cvlc
+#echo Using CVLC
+#raspivid -o - -t 0 -n -w $width -h $height -fps $fps | cvlc -vvv stream:///dev/stdin --sout '#rtp{sdp=rtsp://:8080/}' :demux=h264 --h264-fps=$fps
+### tcp
+#echo Using TCP
+#raspivid -t 0 -w $width -h $height -fps $fps -l -o tcp://0.0.0.0:5000
+### HTTP
+echo "Using HTTP"
+run_py_script&
+sudo modprobe $module
+cvlc v4l2:///dev/video0 --v4l2-width $width --v4l2-height $height --v4l2-chroma h264 --sout '#standard{access=http,mux=ts,dst=0.0.0.0:12345}'

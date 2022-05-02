@@ -37,6 +37,8 @@ def servoSetAngle(servo, angle):
 
 os.environ["SDL_VIDEODRIVER"] = "dummy"
 
+basename = os.path.basename(__file__)
+
 # Dictionary of our servo names to pins on the Pi - may be subject to change
 servos = {"drivetrain" : 21, "steering" : 17,
           "arm_up_down" : 18, "arm_rotate" : 22,
@@ -45,8 +47,8 @@ servos = {"drivetrain" : 21, "steering" : 17,
 
 # pigpio initialization
 pwm = pigpio.pi() # start up the daemon
-for name, pin in servos.items(): 
-    print(f"Initializing: {name} on pin {pin}")
+for name, pin in servos.items():
+    print(f"{basename}: Initializing: {name} on pin {pin}")
     pwm.set_mode(pin, pigpio.OUTPUT) # set each pin to output
     pwm.set_PWM_frequency(pin, 50)   # with 50 hz signal
 
@@ -76,7 +78,7 @@ while not done:
     joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
     # For each joystick:
     for joystick in joysticks:
-        print(joystick.get_name()) # log debug info to the console
+        #print(joystick.get_name()) # log debug info to the console
         axes = joystick.get_numaxes()
         for i in range(axes): # do different stuff with each one
             axis = joystick.get_axis(i)
@@ -93,7 +95,7 @@ while not done:
                     arm_angle = 0
                 if arm_angle > 180:
                     arm_angle = 180
-                print("Arm rotation: "+str(arm_angle))
+                #print("Arm rotation: "+str(arm_angle))
                 servoSetAngle(servos["arm_rotate"]  , arm_angle) # arm rotation may need to be toned up as we stabilize it
             if (i == 3):
                 if (axis > 0.4):
@@ -104,13 +106,13 @@ while not done:
                     arm_elevation_angle = 42
                 if arm_elevation_angle > 140:
                     arm_elevation_angle = 140
-                print("Arm Elevation: "+str(arm_elevation_angle))
+                #print("Arm Elevation: "+str(arm_elevation_angle))
                 servoSetAngle(servos["arm_up_down"] , arm_elevation_angle) # arm up and down full range
             if (i == 4):
                 servoSetAngle(servos["articulation"], (axis+1)*60) # articulation (second servo on arm) with diminished range
             if (i == 5):
                 servoSetAngle(servos["bucket"]      , -1*(axis)*45+90) # bucket servo
-            print("Axis {} value: {:>6.3f}".format(i, axis))
+            #print("Axis {} value: {:>6.3f}".format(i, axis))
 
         buttons = joystick.get_numbuttons()
         # Exit on the B button
@@ -128,7 +130,7 @@ while not done:
 
 pygame.quit()
 for name, pin in servos.items():
-    print(f"Cleaning up {name} on pin {pin}")
+    print(f"{basename}: Cleaning up {name} on pin {pin}")
     pwm.set_PWM_dutycycle(pin, 0)
     pwm.set_PWM_frequency(pin, 0)
 # End egen310.py
